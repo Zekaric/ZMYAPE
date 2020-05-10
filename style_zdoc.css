@@ -1,0 +1,85 @@
+/* MIT License ****************************************************************
+Copyright (c) 2019 Robbert de Groot
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+of the Software, and to permit persons to whom the Software is furnished to do
+so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+******************************************************************************/
+
+:root
+{
+   --regularMargin:      9.0rem;
+   --listMargin:        10.0rem;
+   --listIndent:         1.0rem;
+   --pageMargin:         0.5rem;
+   --paraMargin:         0.9rem;
+   --tableSpacing:       0.5rem;
+   --linkColor:         #555;
+   --linkHoverColor:    #888;
+}
+
+body.zdoc               { margin: 0.0em; }
+h1.zdoc_first           { font-size: 3.00rem; margin: var(--paraMargin); margin-top: var(--paraMargin);            border-bottom: solid 0.25rem; }
+h1.zdoc                 { font-size: 2.00rem; margin: var(--paraMargin); margin-top: 2.0rem;                       border-bottom: solid 0.25rem; }
+h2.zdoc                 { font-size: 1.50rem; margin: var(--paraMargin); margin-top: 1.5rem; margin-left:  1.0rem; }
+h3.zdoc                 { font-size: 1.25rem; margin: var(--paraMargin);                     margin-left:  2.0rem; }
+h4.zdoc                 { font-size: 1.00rem; margin: var(--paraMargin);                     margin-left:  3.0rem; }
+h5.zdoc                 { font-size: 1.00rem; margin: var(--paraMargin);                     margin-left:  4.0rem; }
+h6.zdoc                 { font-size: 1.00rem; margin: var(--paraMargin);                     margin-left:  5.0rem; }
+p.zdoch7                { font-size: 1.00rem; margin: var(--paraMargin);                     margin-left:  6.0rem; }
+p.zdoch8                { font-size: 1.00rem; margin: var(--paraMargin);                     margin-left:  7.0rem; }
+p.zdoch9                { font-size: 1.00rem; margin: var(--paraMargin);                     margin-left:  8.0rem; }
+p.zdoc_toc1             { font-size: 1.00rem;                                                margin-left:  3.0rem; font-weight: bold; }
+p.zdoc_toc2             { font-size: 1.00rem;                                                margin-left:  4.0rem; }
+p.zdoc_toc3             { font-size: 1.00rem;                                                margin-left:  5.0rem; }
+p.zdoc_toc4             { font-size: 1.00rem;                                                margin-left:  6.0rem; }
+p.zdoc_toc5             { font-size: 1.00rem;                                                margin-left:  7.0rem; }
+p.zdoc_toc6             { font-size: 1.00rem;                                                margin-left:  8.0rem; }
+p.zdoc_toc7             { font-size: 1.00rem;                                                margin-left:  9.0rem; }
+p.zdoc_toc8             { font-size: 1.00rem;                                                margin-left: 10.0rem; }
+p.zdoc_toc9             { font-size: 1.00rem;                                                margin-left: 11.0rem; }
+p.zdoc                  { font-size: 1.00rem; margin: var(--paraMargin);                     margin-left:  var(--regularMargin); }
+pre.zdoc                { font-size: 1.00rem; margin: var(--paraMargin);                     margin-left:  var(--regularMargin); margin-right: 9.0rem; border: solid 1px; border-radius: 0.5rem; padding: 0.5rem; background-color: whitesmoke; }
+table.zdoc              {                     margin: var(--paraMargin);                     margin-left:  var(--regularMargin); margin-right: 9.0rem; }
+tr.zdoc                 { }
+tr.zdoc_shade           { background-color: whitesmoke; }
+td.zdoc                 { padding-right: 0.5rem; padding-bottom: 0.1rem; text-align: left; }
+td.zdoc_fill            { padding-right: 0.5rem; padding-bottom: 0.1rem; text-align: left; width: 100%; }
+th.zdoc                 { padding-right: 0.5rem; padding-bottom: 0.1rem; text-align: left;              border-bottom: solid 1px; }
+th.zdoc_fill            { padding-right: 0.5rem; padding-bottom: 0.1rem; text-align: left; width: 100%; border-bottom: solid 1px; }
+th.zdoc_col             { padding-right: 0.5rem; padding-bottom: 0.1rem; text-align: left;              border-bottom: solid 1px; }
+th.zdoc_col_fill        { padding-right: 0.5rem; padding-bottom: 0.1rem; text-align: left; width: 100%; border-bottom: solid 1px; }
+ul.zdoc                                                                         { font-size: 1.0rem; margin-bottom: 0.5rem; margin-left: var(--listMargin); }
+ul.zdoc ul.zdoc                                                                 { font-size: 1.0rem; margin-bottom: 0.0rem; margin-left: var(--listIndent); }
+ul.zdoc ul.zdoc ul.zdoc                                                         { font-size: 1.0rem; margin-bottom: 0.0rem; margin-left: var(--listIndent); }
+ul.zdoc ul.zdoc ul.zdoc ul.zdoc                                                 { font-size: 1.0rem; margin-bottom: 0.0rem; margin-left: var(--listIndent); }
+ul.zdoc ul.zdoc ul.zdoc ul.zdoc ul.zdoc                                         { font-size: 1.0rem; margin-bottom: 0.0rem; margin-left: var(--listIndent); }
+ul.zdoc ul.zdoc ul.zdoc ul.zdoc ul.zdoc ul.zdoc                                 { font-size: 1.0rem; margin-bottom: 0.0rem; margin-left: var(--listIndent); }
+ul.zdoc ul.zdoc ul.zdoc ul.zdoc ul.zdoc ul.zdoc ul.zdoc                         { font-size: 1.0rem; margin-bottom: 0.0rem; margin-left: var(--listIndent); }
+ul.zdoc ul.zdoc ul.zdoc ul.zdoc ul.zdoc ul.zdoc ul.zdoc ul.zdoc                 { font-size: 1.0rem; margin-bottom: 0.0rem; margin-left: var(--listIndent); }
+ul.zdoc ul.zdoc ul.zdoc ul.zdoc ul.zdoc ul.zdoc ul.zdoc ul.zdoc ul.zdoc         { font-size: 1.0rem; margin-bottom: 0.0rem; margin-left: var(--listIndent); }
+ul.zdoc ul.zdoc ul.zdoc ul.zdoc ul.zdoc ul.zdoc ul.zdoc ul.zdoc ul.zdoc ul.zdoc { font-size: 1.0rem; margin-bottom: 0.0rem; margin-left: var(--listIndent); }
+ol.zdoc                                                                         { font-size: 1.0rem; margin-bottom: 0.5rem; margin-left: var(--listMargin); }
+ol.zdoc ol.zdoc                                                                 { font-size: 1.0rem; margin-bottom: 0.0rem; margin-left: var(--listIndent); }
+ol.zdoc ol.zdoc ol.zdoc                                                         { font-size: 1.0rem; margin-bottom: 0.0rem; margin-left: var(--listIndent); }
+ol.zdoc ol.zdoc ol.zdoc ol.zdoc                                                 { font-size: 1.0rem; margin-bottom: 0.0rem; margin-left: var(--listIndent); }
+ol.zdoc ol.zdoc ol.zdoc ol.zdoc ol.zdoc                                         { font-size: 1.0rem; margin-bottom: 0.0rem; margin-left: var(--listIndent); }
+ol.zdoc ol.zdoc ol.zdoc ol.zdoc ol.zdoc ol.zdoc                                 { font-size: 1.0rem; margin-bottom: 0.0rem; margin-left: var(--listIndent); }
+ol.zdoc ol.zdoc ol.zdoc ol.zdoc ol.zdoc ol.zdoc ol.zdoc                         { font-size: 1.0rem; margin-bottom: 0.0rem; margin-left: var(--listIndent); }
+ol.zdoc ol.zdoc ol.zdoc ol.zdoc ol.zdoc ol.zdoc ol.zdoc ol.zdoc                 { font-size: 1.0rem; margin-bottom: 0.0rem; margin-left: var(--listIndent); }
+ol.zdoc ol.zdoc ol.zdoc ol.zdoc ol.zdoc ol.zdoc ol.zdoc ol.zdoc ol.zdoc         { font-size: 1.0rem; margin-bottom: 0.0rem; margin-left: var(--listIndent); }
+ol.zdoc ol.zdoc ol.zdoc ol.zdoc ol.zdoc ol.zdoc ol.zdoc ol.zdoc ol.zdoc ol.zdoc { font-size: 1.0rem; margin-bottom: 0.0rem; margin-left: var(--listIndent); }
