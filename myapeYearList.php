@@ -67,7 +67,7 @@ if ($count > 0 &&
    for ($index = 0; $index < $count; $index++)
    {
       // Check to see if all entries in the list have all the values.
-      if (!zDataListIsExisting($myapeYearList, $index, KEY_YEAR_VALUE)) zDataListSet($myapeYearList, $index, -1);
+      if (!zDataListIsExisting($myapeYearList, $index, KEY_YEAR_VALUE)) zDataListSet($myapeYearList, $index, KEY_YEAR_VALUE, -1);
    }
 }
 

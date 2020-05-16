@@ -111,6 +111,7 @@ td.vmid
 
 td.num
 {
+   font-family:         "Lucida Console", Monaco, monospace;
    vertical-align:      top;
    text-align:          right;
    padding-right:       var(--tableSpacing);

@@ -40,6 +40,7 @@ require_once "zDebug.php";
 
 require_once "myapeVar.php";
 require_once "myapeYearList.php";
+require_once "myapeExpTypeList.php";
 
 ///////////////////////////////////////////////////////////////////////////////
 // global
@@ -48,6 +49,11 @@ require_once "myapeYearList.php";
 ///////////////////////////////////////////////////////////////////////////////
 // Display the page.
 function myapeDisplay()
+{
+   myapeDisplayExpense();
+}
+
+function myapeDisplayExpense()
 {
    myapeYearListSort();
 
@@ -61,18 +67,12 @@ function myapeDisplay()
   <meta charset="utf-8" />
   <link rel="stylesheet" type="text/css" href="style_reset.css">
   <link rel="stylesheet" type="text/css" href="style.css">
-  <title>Zekaric:MYAPE</title>
+  <title>Zekaric:MYAPE:Expense</title>
  </head>
 
  <body>
   
-  <h1>Zekaric : MYAPE 
-END;
-   
-   // Print what we are displaying.
-
-   print <<<END
-</h1>
+  <h1>Zekaric : MYAPE : Expense</h1>
 
   <table>
    <tbody>
@@ -120,7 +120,54 @@ END;
 END;
 
    /////////////////////////////////////////////////////////////////////////
-   // Asset List / Pay List / Expenses List
+   // Expense type List
+   print <<< END
+     <td>
+      <table class="narrow">
+       <tbody>
+        <tr>
+         <th><nobr>Code</nobr></th>
+         <th><nobr>Type</nobr></th>
+        </tr>
+END;
+
+   $count    = myapeExpTypeListGetCount();
+   for ($index = 0; $index < $count; $index++)
+   {
+      $code = myapeExpTypeListGetCode($index);
+      $name = myapeExpTypeListGetName($index);
+
+      if (($index % 2) == 0) print "         <tr class=\"altrow\">\n";
+      else                   print "         <tr>\n";
+
+      print "" . 
+         "          <td>"       . $code .        "</td>\n" .
+         "          <td><nobr>" . $name . "</nobr></td>\n" .
+         "         </tr>\n";
+   }
+
+   print <<< END
+       </tbody>
+      </table>
+     </td>
+END;
+
+   /////////////////////////////////////////////////////////////////////////
+   // Expenses List
+   print <<< END
+     <td class="fillNoPad">
+      <table class="wide">
+       <tbody>
+        <tr>
+         <th             ><nobr>Date</nobr></th>
+         <th             ><nobr>Type</nobr></th>
+         <th             ><nobr>Amount</nobr></th>
+         <th class="desc"><nobr>Comment</nobr></th>
+        </tr>
+       </tbody>
+      </table>
+     </td>
+END;
 
    ////////////////////////////////////////////////////////////////////////////
    // Print the rest of the page.
@@ -148,6 +195,12 @@ END;
    </tr><tr>
     <td><nobr>ys[year]</nobr></td>
     <td>Set the current year.</td>
+   </tr><tr>
+    <td><nobr>ta[name]</nobr></td>
+    <td>Add a new expense type.</td>
+   </tr><tr>
+    <td><nobr>te[code][name]</nobr></td>
+    <td>Edit the name of an expense type</td>
    </tr>
   </table>
   

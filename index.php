@@ -39,10 +39,16 @@ require_once "zUtil.php";
 require_once "myapeVar.php";
 require_once "myapeDisplay.php";
 require_once "myapeYearList.php";
+require_once "myapeExpTypeList.php";
 
 ///////////////////////////////////////////////////////////////////////////////
 // function
 
+// Return:
+// null = failure.
+// !null (array)
+//    0 = integer
+//    1 = rest of the string
 function _ParseGetInt($str)
 {
    $str = trim($str);
@@ -107,33 +113,33 @@ function _ParseGetNonSpaceLetter($str)
       return null;
    }
 
-   $isSet = false;
-   while(true)
-   {
-      $letter = substr($str, 0, 1);
-      $str    = substr($str, 1);
-
-      if ($letter != " " &&
-          $letter != "\t")
-      {
-         $isSet = true;
-         break;    
-      }
-
-      if ($str == "")
-      {
-         break;
-      }
-   }
-
    // Create the result.
-   $result = null;
-   if ($isSet)
+   $result    = array();
+   $result[0] = substr($str, 0, 1);
+   $result[1] = substr($str, 1);
+
+   return $result;
+}
+
+// Return:
+// null = failure.
+// !null (array)
+//    0 = 2 letter code
+//    1 = rest of the string
+function _ParserGetCode($str)
+{
+   $str = trim($str);
+
+   // Nothing to parse.
+   if (strlen($str) <= 1)
    {
-      $result    = array();
-      $result[0] = $letter;
-      $result[1] = $str;
+      return null;
    }
+
+   // Create the result
+   $result = array();
+   $result[0] = substr($str, 0, 2);
+   $result[1] = substr($str, 2);
 
    return $result;
 }
@@ -157,28 +163,68 @@ if ($result != null)
    if ($letter == "y")
    {
       $result = _ParseGetNonSpaceLetter($str);
+      if ($result != null)
+      {
+         $letter = $result[0];
+         $str    = $result[1];
+
+         $year   = -1;
+         if ($letter == "a" ||
+             $letter == "s")
+         {
+            $result = _ParseGetInt($str);
+            if ($result != null)
+            {
+               $year   = $result[0];
+               $str    = $result[1];
+            }
+         }
+
+         if      ($letter == "a" &&
+                  $year   != -1)
+         {
+            myapeYearListAdd(      $year);
+            myapeVarSetYearCurrent($year);
+         }
+         else if ($letter == "s" &&
+                  $year   != -1)
+         {
+            myapeVarSetYearCurrent($year);
+         }
+      }
+   }
+   // Expense Type command
+   if ($letter == "t")
+   {
+      $result = _ParseGetNonSpaceLetter($str);
       $letter = $result[0];
       $str    = $result[1];
 
-      $year   = -1;
-      if ($letter == "a" ||
-          $letter == "s")
+      if      ($letter == "a")
       {
-         $result = _ParseGetInt($str);
-         $year   = $result[0];
-         $str    = $result[1];
-      }
+         $name = trim($str);
 
-      if      ($letter == "a" &&
-               $year   != -1)
-      {
-         myapeYearListAdd(      $year);
-         myapeVarSetYearCurrent($year);
+         myapeExpTypeListAdd($name);
       }
-      else if ($letter == "s" &&
-               $year   != -1)
+      else if ($letter == "e")
       {
-         myapeVarSetYearCurrent($year);
+         $result = _ParserGetCode($str);
+
+         $code = "";
+         if ($result != null)
+         {
+            $code   = $result[0];
+            $str    = $result[1];
+         }
+
+         $name = trim($str);
+
+         $index = myapeExpTypeListIndexFromCode($code);
+         if ($code  != "" &&
+             $index != -1)
+         {
+            myapeExpTypeListEdit($index, $name);
+         }
       }
    }
 }

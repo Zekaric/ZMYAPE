@@ -43,10 +43,11 @@ require_once "zData.php";
 // constant
 $version = 1;
 
-define("VAR_DATA_FILE",    "myape_Var.php");
-define("VAR_DATA_VAR",     "\$myapeVar");
+define("VAR_DATA_FILE",          "myape_Var.php");
+define("VAR_DATA_VAR",           "\$myapeVar");
 
-define("KEY_YEAR_CURRENT", "yearCurrent");
+define("KEY_YEAR_CURRENT",       "yearCurrent");
+define("KEY_ID_NEXT_EXP_TYPE",   "idNextExpType");
 
 ///////////////////////////////////////////////////////////////////////////////
 // variable
@@ -56,7 +57,8 @@ $myapeVar = array();
 if (!zFileIsExisting(VAR_DATA_FILE))
 {
    // Data file doesn't exist yet.  Create a default file.
-   zDataSet($myapeVar, KEY_YEAR_CURRENT, -1);
+   zDataSet($myapeVar, KEY_ID_NEXT_EXP_TYPE,  1);
+   zDataSet($myapeVar, KEY_YEAR_CURRENT,     -1);
 
    // Save the default file.
    zDataSave(VAR_DATA_FILE, $myapeVar, VAR_DATA_VAR);
@@ -66,9 +68,11 @@ if (!zFileIsExisting(VAR_DATA_FILE))
 require_once VAR_DATA_FILE;
 
 // Check if all values are defined of if default ones need to be added.
-if (!zDataIsExisting($myapeVar, KEY_YEAR_CURRENT))
+if (!zDataIsExisting($myapeVar, KEY_ID_NEXT_EXP_TYPE) ||
+    !zDataIsExisting($myapeVar, KEY_YEAR_CURRENT))
 {
-   if (!zDataIsExisting($myapeVar, KEY_YEAR_CURRENT)) zDataSet($myapeVar, KEY_YEAR_CURRENT, -1);
+   if (!zDataIsExisting($myapeVar, KEY_ID_NEXT_EXP_TYPE)) zDataSet($myapeVar, KEY_ID_NEXT_EXP_TYPE, 1);
+   if (!zDataIsExisting($myapeVar, KEY_YEAR_CURRENT))     zDataSet($myapeVar, KEY_YEAR_CURRENT,    -1);
 
    // Save the default file.
    zDataSave(VAR_DATA_FILE, $myapeVar, VAR_DATA_VAR);
@@ -79,6 +83,20 @@ if (!zDataIsExisting($myapeVar, KEY_YEAR_CURRENT))
 ///////////////////////////////////////////////////////////////////////////////
 // global
 // function
+
+///////////////////////////////////////////////////////////////////////////////
+// Get the next id to use for expense types.
+function myapeVarGetIdNextExpType()
+{
+   global $myapeVar;
+
+   $id = zDataGet($myapeVar, KEY_ID_NEXT_EXP_TYPE);
+   zDataSet($myapeVar, KEY_ID_NEXT_EXP_TYPE, $id + 1);
+
+   zDataSave(VAR_DATA_FILE, $myapeVar, VAR_DATA_VAR);
+
+   return $id;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Get the current year that is being displayed/selected.
