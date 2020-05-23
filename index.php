@@ -49,7 +49,7 @@ require_once "myapeExpTypeList.php";
 // !null (array)
 //    0 = integer
 //    1 = rest of the string
-function _ParseGetInt($str)
+function _ParseGetInteger($str)
 {
    $str = trim($str);
 
@@ -65,7 +65,6 @@ function _ParseGetInt($str)
    while(true)
    {
       $letter = substr($str, 0, 1);
-      $str    = substr($str, 1);
 
       if ($letter == "0" ||
           $letter == "1" ||
@@ -79,6 +78,7 @@ function _ParseGetInt($str)
           $letter == "9")
       {
          $num .= $letter;    
+         $str  = substr($str, 1);
       }
       else
       {
@@ -103,7 +103,7 @@ function _ParseGetInt($str)
 // !null (array)
 //    0 = letter.
 //    1 = rest of the string.
-function _ParseGetNonSpaceLetter($str)
+function _ParseGet1Letter($str)
 {
    $str = trim($str);
 
@@ -126,7 +126,7 @@ function _ParseGetNonSpaceLetter($str)
 // !null (array)
 //    0 = 2 letter code
 //    1 = rest of the string
-function _ParserGetCode($str)
+function _ParseGet2Letter($str)
 {
    $str = trim($str);
 
@@ -144,6 +144,29 @@ function _ParserGetCode($str)
    return $result;
 }
 
+// Return:
+// null = failure.
+// !null (array)
+//    0 = 4 letter code
+//    1 = rest of the string.
+function _ParseGet4Letter($str)
+{
+   $str = trim($str);
+
+   // Nothing to parse.
+   if (strlen($str) <= 1)
+   {
+      return null;
+   }
+
+   // Create the result
+   $result = array();
+   $result[0] = substr($str, 0, 4);
+   $result[1] = substr($str, 4);
+
+   return $result;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // The main page processing.
 
@@ -151,28 +174,28 @@ function _ParserGetCode($str)
 $str = zUtilGetValue("cmd");
 
 // Process the command.
-$result = _ParseGetNonSpaceLetter($str);
+$result = _ParseGet1Letter($str);
 
 // if there is a command...
 if ($result != null)
 {
-   $letter = $result[0];
-   $str    = $result[1];
+   $op  = $result[0];
+   $str = $result[1];
 
    // Year command
-   if ($letter == "y")
+   if ($op == "y")
    {
-      $result = _ParseGetNonSpaceLetter($str);
+      $result = _ParseGet1Letter($str);
       if ($result != null)
       {
-         $letter = $result[0];
-         $str    = $result[1];
+         $op  = $result[0];
+         $str = $result[1];
 
          $year   = -1;
-         if ($letter == "a" ||
-             $letter == "s")
+         if ($op == "a" ||
+             $op == "s")
          {
-            $result = _ParseGetInt($str);
+            $result = _ParseGetInteger($str);
             if ($result != null)
             {
                $year   = $result[0];
@@ -180,33 +203,33 @@ if ($result != null)
             }
          }
 
-         if      ($letter == "a" &&
-                  $year   != -1)
+         if      ($op   == "a" &&
+                  $year != -1)
          {
             myapeYearListAdd(      $year);
             myapeVarSetYearCurrent($year);
          }
-         else if ($letter == "s" &&
-                  $year   != -1)
+         else if ($op   == "s" &&
+                  $year != -1)
          {
             myapeVarSetYearCurrent($year);
          }
       }
    }
    // Expense Type command
-   if ($letter == "t")
+   if ($op == "t")
    {
-      $result = _ParseGetNonSpaceLetter($str);
-      $letter = $result[0];
+      $result = _ParseGet1Letter($str);
+      $op     = $result[0];
       $str    = $result[1];
 
-      if      ($letter == "a")
+      if      ($op == "a")
       {
          $name = trim($str);
 
          myapeExpTypeListAdd($name);
       }
-      else if ($letter == "e")
+      else if ($op == "e")
       {
          $result = _ParserGetCode($str);
 
@@ -219,11 +242,109 @@ if ($result != null)
 
          $name = trim($str);
 
-         $index = myapeExpTypeListIndexFromCode($code);
+         $index = myapeExpTypeListGetIndexFromCode($code);
          if ($code  != "" &&
              $index != -1)
          {
             myapeExpTypeListEdit($index, $name);
+         }
+      }
+   }
+   // Expense command
+   if ($op == "e")
+   {
+      //zDebugPrint($str);
+
+      $result = _ParseGet1Letter($str);
+      $op     = $result[0];
+      $str    = $result[1];
+
+      if ($op == "e" ||
+          $op == "~")
+      {
+         $result = _ParseGetInteger($str);
+         $id     = (int) $result[0];
+         $str    = $result[1];
+      
+         //zDebugPrint($id);
+      }
+
+      //zDebugPrint($op);
+
+      $date        = null;
+      $typeCode    = null;
+      $amountList  = array();
+      $amountCount = 0;
+      $comment     = null;
+      if ($op == "a" ||
+          $op == "e")
+      {
+         while (true)
+         {
+            $result = _ParseGet1Letter($str);
+            if ($result == null)
+            {
+               break;
+            }
+
+            //zDebugPrintArray($result);
+
+            $letter = $result[0];
+            $str    = $result[1];
+
+            if      ($letter == "d")
+            {
+               $result = _ParseGet4Letter($str);
+               $date   = $result[0];
+               $str    = $result[1];
+
+               //zDebugPrint("d " . $date);
+            }
+            else if ($letter == "t")
+            {
+               $result   = _ParseGet2Letter($str);
+               $typeCode = $result[0];
+               $str      = $result[1];
+
+               //zDebugPrint("t " . $typeCode);
+            }
+            else if ($letter == "a")
+            {
+               $result                     = _ParseGetInteger($str);
+               $amountList[$amountCount++] = $result[0];
+               $str                        = $result[1];
+
+               //zDebugPrint("a " . $amountList[$amountCount - 1]);
+            }
+            else if ($letter == "`")
+            {
+               $comment = $str;
+
+               //zDebugPrint("` " . $comment);
+               break;
+            }
+         }
+
+         if      ($op == "a")
+         {
+            for ($index = 0; $index < $amountCount; $index++)
+            {
+               myapeExpListAdd($date, $typeCode, $amountList[$index], $comment);
+            }
+         }
+         else if ($op == "e")
+         {
+            $index = myapeExpListGetIndexFromId($id);
+
+            if ($index != -1)
+            {
+               if ($amountCount <= 0)    $amountList[0] = myapeExpListGetAmount(  $index);
+               if ($comment     == null) $commnet       = myapeExpListGetComment( $index);
+               if ($date        == null) $date          = myapeExpListGetDate(    $index);
+               if ($typeCode    == null) $typeCode      = myapeExpListGetTypeCode($index);
+
+               myapeExpListEdit($index, $date, $typeCode, $amount[0], $comment);
+            }
          }
       }
    }

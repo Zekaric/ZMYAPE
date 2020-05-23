@@ -41,6 +41,7 @@ require_once "zDebug.php";
 require_once "myapeVar.php";
 require_once "myapeYearList.php";
 require_once "myapeExpTypeList.php";
+require_once "myapeExpList.php";
 
 ///////////////////////////////////////////////////////////////////////////////
 // global
@@ -56,6 +57,7 @@ function myapeDisplay()
 function myapeDisplayExpense()
 {
    myapeYearListSort();
+   myapeExpListSort();
 
    ////////////////////////////////////////////////////////////////////////////
    // Print the header.
@@ -141,8 +143,8 @@ END;
       else                   print "         <tr>\n";
 
       print "" . 
-         "          <td>"       . $code .        "</td>\n" .
-         "          <td><nobr>" . $name . "</nobr></td>\n" .
+         "          <td class=\"mono\">" . $code .        "</td>\n" .
+         "          <td><nobr>"          . $name . "</nobr></td>\n" .
          "         </tr>\n";
    }
 
@@ -159,11 +161,54 @@ END;
       <table class="wide">
        <tbody>
         <tr>
+         <th             ><nobr>Id</nobr></th>
          <th             ><nobr>Date</nobr></th>
          <th             ><nobr>Type</nobr></th>
          <th             ><nobr>Amount</nobr></th>
          <th class="desc"><nobr>Comment</nobr></th>
         </tr>
+END;
+
+   $count = myapeExpListGetCount();
+   $total = 0;
+   for ($index = 0; $index < $count; $index++)
+   {
+      $id      = myapeExpListGetId(     $index);
+      $date    = myapeExpListGetDate(   $index);
+      $type    = myapeExpTypeListGetName(myapeExpTypeListGetIndexFromCode(myapeExpListGetTypeId($index)));
+      $amount  = myapeExpListGetAmount( $index);
+      $comment = myapeExpListGetComment($index);
+
+      $amountInt = (int) $amount;
+      $total    += $amountInt;
+
+      $amountLen = strlen($amount);
+      $centPos   = $amountLen - 2;
+      $amountStr = substr($amount, 0, $centPos) . "." . substr($amount, $centPos);
+
+
+      if (($index % 2) == 0) print "         <tr class=\"altrow\">\n";
+      else                   print "         <tr>\n";
+
+      print "" .
+         "         <td class=\"num\">" . $id         . "</td>\n" .
+         "         <td class=\"num\">" . $date       . "</td>\n" .
+         "         <td              >" . $type       . "</td>\n" .
+         "         <td class=\"num\">" . $amountStr  . "</td>\n" .
+         "         <td              >" . $comment    . "</td>\n" .
+         "        </tr>\n";
+   }
+
+   // Print the total
+   print "".
+         "         <td class=\"num\">" . $index   . "</td>\n" .
+         "         <td class=\"num\"></td>\n" .
+         "         <td              >Total</td>\n" .
+         "         <td class=\"num\">" . ($total / 100.0) . "</td>\n" .
+         "         <td              ></td>\n" .
+         "        </tr>\n";
+
+   print <<< END
        </tbody>
       </table>
      </td>
@@ -201,6 +246,12 @@ END;
    </tr><tr>
     <td><nobr>te[code][name]</nobr></td>
     <td>Edit the name of an expense type</td>
+   </tr><tr>
+    <td><nobr>ead[MMDD]t[code][a[value]]*`[comment]</nobr></td>
+    <td>Add a new expense.</td>
+   </tr><tr>
+    <td><nobr>ee[id]d[MMDD]t[code]a[value]`[comment]</nobr></td>
+    <td>Edit an expense.</td>
    </tr>
   </table>
   

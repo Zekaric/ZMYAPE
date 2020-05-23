@@ -47,6 +47,7 @@ define("VAR_DATA_FILE",          "myape_Var.php");
 define("VAR_DATA_VAR",           "\$myapeVar");
 
 define("KEY_YEAR_CURRENT",       "yearCurrent");
+define("KEY_ID_NEXT_EXP",        "idNextExp");
 define("KEY_ID_NEXT_EXP_TYPE",   "idNextExpType");
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -57,6 +58,7 @@ $myapeVar = array();
 if (!zFileIsExisting(VAR_DATA_FILE))
 {
    // Data file doesn't exist yet.  Create a default file.
+   zDataSet($myapeVar, KEY_ID_NEXT_EXP,       1);
    zDataSet($myapeVar, KEY_ID_NEXT_EXP_TYPE,  1);
    zDataSet($myapeVar, KEY_YEAR_CURRENT,     -1);
 
@@ -68,9 +70,11 @@ if (!zFileIsExisting(VAR_DATA_FILE))
 require_once VAR_DATA_FILE;
 
 // Check if all values are defined of if default ones need to be added.
-if (!zDataIsExisting($myapeVar, KEY_ID_NEXT_EXP_TYPE) ||
+if (!zDataIsExisting($myapeVar, KEY_ID_NEXT_EXP)      ||
+    !zDataIsExisting($myapeVar, KEY_ID_NEXT_EXP_TYPE) ||
     !zDataIsExisting($myapeVar, KEY_YEAR_CURRENT))
 {
+   if (!zDataIsExisting($myapeVar, KEY_ID_NEXT_EXP))      zDataSet($myapeVar, KEY_ID_NEXT_EXP,      1);
    if (!zDataIsExisting($myapeVar, KEY_ID_NEXT_EXP_TYPE)) zDataSet($myapeVar, KEY_ID_NEXT_EXP_TYPE, 1);
    if (!zDataIsExisting($myapeVar, KEY_YEAR_CURRENT))     zDataSet($myapeVar, KEY_YEAR_CURRENT,    -1);
 
@@ -83,6 +87,20 @@ if (!zDataIsExisting($myapeVar, KEY_ID_NEXT_EXP_TYPE) ||
 ///////////////////////////////////////////////////////////////////////////////
 // global
 // function
+
+///////////////////////////////////////////////////////////////////////////////
+// Get the next id to us for expenses.
+function myapeVarGetIdNextExp()
+{
+   global $myapeVar;
+
+   $id = zDataGet($myapeVar, KEY_ID_NEXT_EXP);
+   zDataSet($myapeVar, KEY_ID_NEXT_EXP, $id + 1);
+
+   zDataSave(VAR_DATA_FILE, $myapeVar, VAR_DATA_VAR);
+
+   return $id;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Get the next id to use for expense types.
