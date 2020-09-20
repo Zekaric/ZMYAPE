@@ -5,7 +5,7 @@ Author: Robbert de Groot
 
 Description:
 
-Manage the myape_ExpTypeList.php file.
+Manage the myape_ExpList.php file.
 
 The list of years we have data for.
 
@@ -41,8 +41,8 @@ require_once "myapeVar.php";
 
 ///////////////////////////////////////////////////////////////////////////////
 // constant
-define("EXP_LISTDATA_FILE_PRE",  "myape_");
-define("EXP_LISTDATA_FILE_POST", "_ExpList.php");
+define("EXP_LISTDATA_FILE_PRE",  "myape_ExpList_");
+define("EXP_LISTDATA_FILE_POST", ".php");
 define("EXP_LISTDATA_VAR",       "\$myapeExpList");
 
 define("KEY_EXP_ID",             "id");
@@ -199,11 +199,6 @@ function myapeExpListSet($index, $id, $date, $typeId, $amount, $comment)
 {
    global $myapeExpList;
 
-   if ($comment != null)
-   {
-      $comment = "";
-   }
-
    zDataListSet($myapeExpList, $index, KEY_EXP_ID,      $id);
    zDataListSet($myapeExpList, $index, KEY_EXP_AMOUNT,  $amount);
    zDataListSet($myapeExpList, $index, KEY_EXP_DATE,    $date);
@@ -234,7 +229,7 @@ function myapeExpListSortFunction($a, $b)
    $atype  = myapeExpTypeListGetName(myapeExpTypeListGetIndexFromCode($a[KEY_EXP_TYPEID]));
    $btype  = myapeExpTypeListGetName(myapeExpTypeListGetIndexFromCode($b[KEY_EXP_TYPEID]));
    $result = strcmp($atype, $btype);
-   if ($result != 0) return result;
+   if ($result != 0) return $result;
 
    // Then finally by id.
    // Id's are unique so there is never an equality.

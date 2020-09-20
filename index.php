@@ -37,9 +37,6 @@ require_once "zDebug.php";
 require_once "zUtil.php";
 
 require_once "myapeVar.php";
-require_once "myapeDisplay.php";
-require_once "myapeYearList.php";
-require_once "myapeExpTypeList.php";
 
 ///////////////////////////////////////////////////////////////////////////////
 // function
@@ -174,23 +171,52 @@ function _ParseGet4Letter($str)
 $str = zUtilGetValue("cmd");
 
 // Process the command.
+$op = "";
 $result = _ParseGet1Letter($str);
+if ($result != null) { $op = $result[0]; $str = $result[1]; }
 
-// if there is a command...
-if ($result != null)
+// Common commands
+// Switching Lists
+if ($op == "l")
 {
-   $op  = $result[0];
-   $str = $result[1];
+   $op     = "";
+   $result = _ParseGet1Letter($str);
+   if ($result != null) { $op = $result[0]; $str = $result[1]; }
 
+   if      ($op == "")
+   {
+      if      (myapeVarIsDisplayListAsset())    myapeVarSetIsDisplayListPay();
+      else if (myapeVarIsDisplayListPay())      myapeVarSetIsDisplayListExpense();
+      else if (myapeVarIsDisplayListExpense())  myapeVarSetIsDisplayListAsset();
+   }
+   else if ($op == "a")                         myapeVarSetIsDisplayListAsset();
+   else if ($op == "p")                         myapeVarSetIsDisplayListPay();
+   else if ($op == "e")                         myapeVarSetIsDisplayListExpense();
+
+   require_once "myapeDisplay.php";
+}
+// Commands for asset
+else if (myapeVarIsDisplayListAsset())
+{
+   require_once "myapeDisplay.php";
+   require_once "myapeAssList.php";
+}
+// Commands for pay
+else if (myapeVarIsDisplayListPay())
+{
+
+}
+// Commands for expense
+else if (myapeVarIsDisplayListExpense())
+{
    // Year command
    if ($op == "y")
    {
       $result = _ParseGet1Letter($str);
+      if ($result != null) { $op = $result[0]; $str = $result[1]; }
+      
       if ($result != null)
       {
-         $op  = $result[0];
-         $str = $result[1];
-
          $year   = -1;
          if ($op == "a" ||
              $op == "s")
@@ -216,6 +242,13 @@ if ($result != null)
          }
       }
    }
+
+   // Year processing needs to be done before these includes because the current
+   // year could change what script is being used.
+   require_once "myapeDisplay.php";
+   require_once "myapeYearList.php";
+   require_once "myapeExpTypeList.php";
+
    // Expense Type command
    if ($op == "t")
    {
@@ -265,17 +298,17 @@ if ($result != null)
          $result = _ParseGetInteger($str);
          $id     = (int) $result[0];
          $str    = $result[1];
-      
+   
          //zDebugPrint($id);
       }
 
       //zDebugPrint($op);
 
-      $date        = null;
-      $typeCode    = null;
-      $amountList  = array();
-      $amountCount = 0;
-      $comment     = null;
+      $date          = myapeVarGetDefaultExpDate();
+      $typeCode      = myapeVarGetDefaultExpType();
+      $amountList    = array();
+      $amountCount   = 0;
+      $comment       = "";
       if ($op == "a" ||
           $op == "e")
       {
@@ -295,6 +328,12 @@ if ($result != null)
             if      ($letter == "d")
             {
                $result = _ParseGet4Letter($str);
+
+               if ($date != $result[0])
+               {
+                  myapeVarSetDefaultExpDate($result[0]);
+               }
+
                $date   = $result[0];
                $str    = $result[1];
 
@@ -303,6 +342,12 @@ if ($result != null)
             else if ($letter == "t")
             {
                $result   = _ParseGet2Letter($str);
+
+               if ($typeCode != $result[0])
+               {
+                  myapeVarSetDefaultExpType($result[0]);
+               }
+
                $typeCode = $result[0];
                $str      = $result[1];
 
@@ -348,7 +393,7 @@ if ($result != null)
          }
       }
    }
-}
+   }
 
 // Display the result page.
 myapeDisplay();

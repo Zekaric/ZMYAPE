@@ -47,8 +47,17 @@ define("VAR_DATA_FILE",          "myape_Var.php");
 define("VAR_DATA_VAR",           "\$myapeVar");
 
 define("KEY_YEAR_CURRENT",       "yearCurrent");
+define("KEY_ID_NEXT_ASS",        "idNextAss");
 define("KEY_ID_NEXT_EXP",        "idNextExp");
 define("KEY_ID_NEXT_EXP_TYPE",   "idNextExpType");
+
+define("KEY_DEFAULT_EXP_DATE",   "expDateDefault");
+define("KEY_DEFAULT_EXP_TYPE",   "expTypeDefault");
+
+define("KEY_DISPLAY_LIST",       "displayList");
+define("VALUE_DISPLAY_LIST_ASS", "ass");
+define("VALUE_DISPLAY_LIST_PAY", "pay");
+define("VALUE_DISPLAY_LIST_EXP", "exp");
 
 ///////////////////////////////////////////////////////////////////////////////
 // variable
@@ -58,9 +67,15 @@ $myapeVar = array();
 if (!zFileIsExisting(VAR_DATA_FILE))
 {
    // Data file doesn't exist yet.  Create a default file.
+   zDataSet($myapeVar, KEY_ID_NEXT_ASS,       1);
    zDataSet($myapeVar, KEY_ID_NEXT_EXP,       1);
    zDataSet($myapeVar, KEY_ID_NEXT_EXP_TYPE,  1);
    zDataSet($myapeVar, KEY_YEAR_CURRENT,     -1);
+
+   zDataSet($myapeVar, KEY_DEFAULT_EXP_DATE, "0101");
+   zDataSet($myapeVar, KEY_DEFAULT_EXP_TYPE,  0);
+
+   zDataSet($myapeVar, KEY_DISPLAY_LIST,      VALUE_DISPLAY_LIST_EXP);
 
    // Save the default file.
    zDataSave(VAR_DATA_FILE, $myapeVar, VAR_DATA_VAR);
@@ -70,13 +85,23 @@ if (!zFileIsExisting(VAR_DATA_FILE))
 require_once VAR_DATA_FILE;
 
 // Check if all values are defined of if default ones need to be added.
-if (!zDataIsExisting($myapeVar, KEY_ID_NEXT_EXP)      ||
+if (!zDataIsExisting($myapeVar, KEY_ID_NEXT_ASS)      ||
+    !zDataIsExisting($myapeVar, KEY_ID_NEXT_EXP)      ||
     !zDataIsExisting($myapeVar, KEY_ID_NEXT_EXP_TYPE) ||
-    !zDataIsExisting($myapeVar, KEY_YEAR_CURRENT))
+    !zDataIsExisting($myapeVar, KEY_YEAR_CURRENT)     ||
+    !zDataIsExisting($myapeVar, KEY_DEFAULT_EXP_DATE) ||
+    !zDataIsExisting($myapeVar, KEY_DEFAULT_EXP_TYPE) ||
+    !zDataIsExisting($myapeVar, KEY_DISPLAY_LIST))
 {
-   if (!zDataIsExisting($myapeVar, KEY_ID_NEXT_EXP))      zDataSet($myapeVar, KEY_ID_NEXT_EXP,      1);
-   if (!zDataIsExisting($myapeVar, KEY_ID_NEXT_EXP_TYPE)) zDataSet($myapeVar, KEY_ID_NEXT_EXP_TYPE, 1);
-   if (!zDataIsExisting($myapeVar, KEY_YEAR_CURRENT))     zDataSet($myapeVar, KEY_YEAR_CURRENT,    -1);
+   if (!zDataIsExisting($myapeVar, KEY_ID_NEXT_ASS))      zDataSet($myapeVar, KEY_ID_NEXT_ASS,       1);
+   if (!zDataIsExisting($myapeVar, KEY_ID_NEXT_EXP))      zDataSet($myapeVar, KEY_ID_NEXT_EXP,       1);
+   if (!zDataIsExisting($myapeVar, KEY_ID_NEXT_EXP_TYPE)) zDataSet($myapeVar, KEY_ID_NEXT_EXP_TYPE,  1);
+   if (!zDataIsExisting($myapeVar, KEY_YEAR_CURRENT))     zDataSet($myapeVar, KEY_YEAR_CURRENT,     -1);
+   
+   if (!zDataIsExisting($myapeVar, KEY_DEFAULT_EXP_DATE)) zDataSet($myapeVar, KEY_DEFAULT_EXP_DATE, "0101");
+   if (!zDataIsExisting($myapeVar, KEY_DEFAULT_EXP_TYPE)) zDataSet($myapeVar, KEY_DEFAULT_EXP_TYPE, "--");
+
+   if (!zDataIsExisting($myapeVar, KEY_DISPLAY_LIST))     zDataSet($myapeVar, KEY_DISPLAY_LIST,     VALUE_DISPLAY_LIST_EXP);
 
    // Save the default file.
    zDataSave(VAR_DATA_FILE, $myapeVar, VAR_DATA_VAR);
@@ -87,6 +112,61 @@ if (!zDataIsExisting($myapeVar, KEY_ID_NEXT_EXP)      ||
 ///////////////////////////////////////////////////////////////////////////////
 // global
 // function
+
+///////////////////////////////////////////////////////////////////////////////
+// Get expense date default
+function myapeVarGetDefaultExpDate()
+{
+   global $myapeVar;
+
+   return zDataGet($myapeVar, KEY_DEFAULT_EXP_DATE);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Get the expense type default
+function myapeVarGetDefaultExpType()
+{
+   global $myapeVar;
+
+   return zDataGet($myapeVar, KEY_DEFAULT_EXP_TYPE);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Which display list are we showing.
+function myapeVarIsDisplayListAsset()
+{
+   global $myapeVar;
+
+   return zDataGet($myapeVar, KEY_DISPLAY_LIST) == VALUE_DISPLAY_LIST_ASS;
+}
+
+function myapeVarIsDisplayListPay()
+{
+   global $myapeVar;
+
+   return zDataGet($myapeVar, KEY_DISPLAY_LIST) == VALUE_DISPLAY_LIST_PAY;
+}
+
+function myapeVarIsDisplayListExpense()
+{
+   global $myapeVar;
+
+   return zDataGet($myapeVar, KEY_DISPLAY_LIST) == VALUE_DISPLAY_LIST_EXP;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Get the next id to us for expenses.
+function myapeVarGetIdNextAss()
+{
+   global $myapeVar;
+
+   $id = zDataGet($myapeVar, KEY_ID_NEXT_ASS);
+   zDataSet($myapeVar, KEY_ID_NEXT_ASS, $id + 1);
+
+   zDataSave(VAR_DATA_FILE, $myapeVar, VAR_DATA_VAR);
+
+   return $id;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Get the next id to us for expenses.
@@ -123,6 +203,57 @@ function myapeVarGetYearCurrent()
    global $myapeVar;
 
    return zDataGet($myapeVar, KEY_YEAR_CURRENT);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Set the expense date default
+function myapeVarSetDefaultExpDate($date)
+{
+   global $myapeVar;
+
+   zDataSet($myapeVar, KEY_DEFAULT_EXP_DATE, $date);
+
+   zDataSave(VAR_DATA_FILE, $myapeVar, VAR_DATA_VAR);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Set the expense type default
+function myapeVarSetDefaultExpType($type)
+{
+   global $myapeVar;
+
+   zDataSet($myapeVar, KEY_DEFAULT_EXP_TYPE, $type);
+
+   zDataSave(VAR_DATA_FILE, $myapeVar, VAR_DATA_VAR);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Which display list are we showing.
+function myapeVarSetIsDisplayListAsset()
+{
+   global $myapeVar;
+
+   zDataSet($myapeVar, KEY_DISPLAY_LIST, VALUE_DISPLAY_LIST_ASS);
+
+   zDataSave(VAR_DATA_FILE, $myapeVar, VAR_DATA_VAR);
+}
+
+function myapeVarSetIsDisplayListPay()
+{
+   global $myapeVar;
+
+   zDataSet($myapeVar, KEY_DISPLAY_LIST, VALUE_DISPLAY_LIST_PAY);
+
+   zDataSave(VAR_DATA_FILE, $myapeVar, VAR_DATA_VAR);
+}
+
+function myapeVarSetIsDisplayListExpense()
+{
+   global $myapeVar;
+
+   zDataSet($myapeVar, KEY_DISPLAY_LIST, VALUE_DISPLAY_LIST_EXP);
+
+   zDataSave(VAR_DATA_FILE, $myapeVar, VAR_DATA_VAR);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

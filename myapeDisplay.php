@@ -40,6 +40,7 @@ require_once "zDebug.php";
 
 require_once "myapeVar.php";
 require_once "myapeYearList.php";
+require_once "myapeAssList.php";
 require_once "myapeExpTypeList.php";
 require_once "myapeExpList.php";
 
@@ -51,9 +52,261 @@ require_once "myapeExpList.php";
 // Display the page.
 function myapeDisplay()
 {
-   myapeDisplayExpense();
+   if      (myapeVarIsDisplayListAsset())
+   {
+      myapeDisplayAsset();
+   }
+   else if (myapeVarIsDisplayListPay())
+   {
+      myapeDisplayPay();
+   }
+   else if (myapeVarIsDisplayListExpense())
+   {
+      myapeDisplayExpense();
+   }
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// Display assets.
+function myapeDisplayAsset()
+{
+   myapeAssListSort();
+
+   ////////////////////////////////////////////////////////////////////////////
+   // Print the header.
+   print <<<END
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+
+ <head>
+  <meta charset="utf-8" />
+  <link rel="stylesheet" type="text/css" href="style_reset.css">
+  <link rel="stylesheet" type="text/css" href="style.css">
+  <title>Zekaric:MYAPE:Asset</title>
+ </head>
+
+ <body>
+  
+  <h1>Zekaric : MYAPE : Asset</h1>
+
+  <table>
+   <tbody>
+     <td>
+      <table class="narrow">
+       <tbody>
+        <tr>
+         <th><nobr>Code</nobr></th>
+         <th><nobr>Type</nobr></th>
+        </tr><tr>
+         <td>as</td><td><nobr>Asset</nobr></td>
+        </tr><tr>
+         <td>bs</td><td><nobr>Bond Savings</nobr></td>
+        </tr><tr>
+         <td>br</td><td><nobr>Bond TFSA</nobr></td>
+        </tr><tr>
+         <td>bt</td><td><nobr>Bond RRSP</nobr></td>
+        </tr><tr>
+         <td>gs</td><td><nobr>GIC Savings</nobr></td>
+        </tr><tr>
+         <td>gr</td><td><nobr>GIC TFSA</nobr></td>
+        </tr><tr>
+         <td>gt</td><td><nobr>GIC RRSP</nobr></td>
+        </tr><tr>
+         <td>ms</td><td><nobr>Mutual Fund Savings</nobr></td>
+        </tr><tr>
+         <td>mr</td><td><nobr>Mutual Fund TFSA</nobr></td>
+        </tr><tr>
+         <td>mt</td><td><nobr>Mutual Fund RRSP</nobr></td>
+        </tr><tr>
+         <td>sa</td><td><nobr>Savings Cash</nobr></td>
+        </tr><tr>
+         <td>ss</td><td><nobr>Stock Savings</nobr></td>
+        </tr><tr>
+         <td>sr</td><td><nobr>Stock TFSA</nobr></td>
+        </tr><tr>
+         <td>st</td><td><nobr>Stock RRSP</nobr></td>
+        </tr>
+       </tbody>
+      </table>
+     </td>
+     <td class="fillNoPad">
+      <table class="wide">
+       <tbody>
+        <tr>
+         <th             ><nobr>Id</nobr></th>
+         <th             ><nobr>Type</nobr></th>
+         <th             ><nobr>Start Date</nobr></th>
+         <th             ><nobr>End Data</nobr></th>
+         <th             ><nobr>Start Amount</nobr></th>
+         <th             ><nobr>Current/End Amount</nobr></th>
+         <th             ><nobr>Delta Amount</nobr></th>
+         <th class="desc">Comment</nobr></th>
+        </tr>
+END;
+
+   $count      = myapeAssListGetCount();
+   $totalStart = 0;
+   $totalStop  = 0;
+   for ($index = 0; $index < $count; $index++)
+   {
+      $id            = myapeAssListGetId(          $index);
+      $type          = myapeAssListGetTypeName(    myapeAssListGetTypeId($index));
+      $dateStart     = myapeAssListGetDateStart(   $index);
+      $dateStop      = myapeAssListGetDateStop(    $index);
+      $amountStart   = myapeAssListGetAmountStart( $index);
+      $amountStop    = myapeAssListGetAmountStop(  $index);
+      $comment       = myapeAssListGetComment(     $index);
+
+      $amountIntStart = (int) $amountStart;
+      $totalStart    += $amountIntStart;
+
+      $amountIntStop  = (int) $amountStop;
+      $totalStop     += $amountIntStop;
+
+      $amountStartStr = myapeDisplayAddAmountDecimal($amountStart);
+      $amountStopStr  = myapeDisplayAddAmountDecimal($amountStop);
+
+      if (($index % 2) == 0) print "         <tr class=\"altrow\">\n";
+      else                   print "         <tr>\n";
+
+      print "" .
+         "         <td class=\"num\">" . $id             . "</td>\n" .
+         "         <td        ><nobr>" . $type           . "</nobr></td>\n" .
+         "         <td class=\"num\">" . $dateStart      . "</td>\n" .
+         "         <td class=\"num\">" . $dateStop       . "</td>\n" .
+         "         <td class=\"num\">" . $amountStartStr . "</td>\n" .
+         "         <td class=\"num\">" . $amountStopStr  . "</td>\n" .
+         "         <td class=\"num\">" . (($amountIntStop - $amountIntStart) / 100.0) . "</td>\n" .
+         "         <td              >" . $comment        . "</td>\n" .
+         "        </tr>\n";
+   }
+
+
+   // Print the total
+   print "".
+      "         <td class=\"num\">" . $index   . "</td>\n" .
+      "         <td              ></td>\n" .
+      "         <td class=\"num\"></td>\n" .
+      "         <td              >Total</td>\n" .
+      "         <td class=\"num\">" . ($totalStart / 100.0) . "</td>\n" .
+      "         <td class=\"num\">" . ($totalStop  / 100.0) . "</td>\n" .
+      "         <td class=\"num\"></td>\n" .
+      "         <td              ></td>\n" .
+      "        </tr>\n";
+
+   print <<< END
+       </tbody>
+      </table>
+     </td>
+END;
+
+   ////////////////////////////////////////////////////////////////////////////
+   // Print the rest of the page.
+   print <<< END
+    </tr>
+   </tbody>
+  </table>
+END;
+
+   print <<< END
+  <form method="GET">
+   <p><input name="cmd" id="cmd" type="text" size="150" autofocus /></p>
+   <input type="submit" hidden />
+  </form>
+
+  <table>
+   <tr>
+    <th>Commands</th>
+    <th class="desc">Description</th>
+   </tr><tr>
+    <td><nobr>l[|a|p|e]</nobr></td>
+    <td>Switch between a)sset, p)ay, and e)xpense lists. Just "l" cycles to the next list.</td>
+   </tr><tr>
+    <td><nobr>aa[t[code]][d[YYYYMMDD]][D[YYYYMMDD]][a[value]][A[value]]`[comment]</nobr></td>
+    <td>Add a new asset.  't' Type of asset code.  'd', 'D' start and end dates.  'a', 'A' start and current/end amount.  Comment must be last.</td>
+   </tr><tr>
+    <td><nobr>ae[id][t[code]][d[YYYYMMDD]][D[YYYYMMDD]][a[value]][A[value]]`[comment]</nobr></td>
+    <td>Edit an asset.</td>
+   </tr><tr>
+    <td><nobr>a-[id]</nobr></td>
+    <td>Mark an asset as obsolete.</td>
+   </tr>
+  </table>
+  
+ </body>
+
+</html>
+END;
+}
+
+function myapeDisplayPay()
+{
+   myapeAssListSort();
+
+   ////////////////////////////////////////////////////////////////////////////
+   // Print the header.
+   print <<<END
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+
+ <head>
+  <meta charset="utf-8" />
+  <link rel="stylesheet" type="text/css" href="style_reset.css">
+  <link rel="stylesheet" type="text/css" href="style.css">
+  <title>Zekaric:MYAPE:Pay</title>
+ </head>
+
+ <body>
+  
+  <h1>Zekaric : MYAPE : Pay</h1>
+
+  <p>Todo</p>
+
+  <form method="GET">
+   <p><input name="cmd" id="cmd" type="text" size="150" autofocus /></p>
+   <input type="submit" hidden />
+  </form>
+
+  <table>
+   <tr>
+    <th>Commands</th>
+    <th class="desc">Description</th>
+   </tr><tr>
+    <td><nobr>l</nobr></td>
+    <td>Switch between a)sset, p)ay, and e)xpense lists. Just "l" cycles to the next list.</td>
+   </tr>
+   </tr><tr>
+    <td><nobr>ya[year]</nobr></td>
+    <td>Add a year and set it as the current year.</td>
+   </tr><tr>
+    <td><nobr>ys[year]</nobr></td>
+    <td>Set the current year.</td>
+   </tr><tr>
+    <td><nobr>tA[name]</nobr></td>
+    <td>Add a new credit type.</td>
+   </tr><tr>
+    <td><nobr>ta[name]</nobr></td>
+    <td>Add a new debit type.</td>
+   </tr><tr>
+    <td><nobr>te[code][name]</nobr></td>
+    <td>Edit the name of an expense type</td>
+   </tr><tr>
+    <td><nobr>pad[MMDD]t[code][a[value]]*`[comment]</nobr></td>
+    <td>Add a new pay record.</td>
+   </tr><tr>
+    <td><nobr>pe[id]d[MMDD]t[code]a[value]`[comment]</nobr></td>
+    <td>Edit a pay record.</td>
+   </tr>
+  </table>
+  
+ </body>
+
+</html>
+END;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Display expenses.
 function myapeDisplayExpense()
 {
    myapeYearListSort();
@@ -182,10 +435,7 @@ END;
       $amountInt = (int) $amount;
       $total    += $amountInt;
 
-      $amountLen = strlen($amount);
-      $centPos   = $amountLen - 2;
-      $amountStr = substr($amount, 0, $centPos) . "." . substr($amount, $centPos);
-
+      $amountStr = myapeDisplayAddAmountDecimal($amount);
 
       if (($index % 2) == 0) print "         <tr class=\"altrow\">\n";
       else                   print "         <tr>\n";
@@ -193,7 +443,7 @@ END;
       print "" .
          "         <td class=\"num\">" . $id         . "</td>\n" .
          "         <td class=\"num\">" . $date       . "</td>\n" .
-         "         <td              >" . $type       . "</td>\n" .
+         "         <td        ><nobr>" . $type       . "</nobr></td>\n" .
          "         <td class=\"num\">" . $amountStr  . "</td>\n" .
          "         <td              >" . $comment    . "</td>\n" .
          "        </tr>\n";
@@ -220,7 +470,19 @@ END;
     </tr>
    </tbody>
   </table>
+END;
 
+   print "" .
+      "   <table>\n" .
+      "    <tr>\n" .
+      "     <td>Defaults:</td>" .
+      "<td>Date:</td> <td>" . myapeVarGetDefaultExpDate() . "</td>" .
+      "<td>Type:</td> <td>" . myapeVarGetDefaultExpType() . "</td>\n" .
+      "<td class=\"fill\" />\n" .
+      "    </tr>\n" .
+      "   </table>\n";
+
+   print <<< END
   <form method="GET">
    <p><input name="cmd" id="cmd" type="text" size="150" autofocus /></p>
    <input type="submit" hidden />
@@ -232,7 +494,7 @@ END;
     <th class="desc">Description</th>
    </tr><tr>
     <td><nobr>l</nobr></td>
-    <td>Switch between t)ask and p)roject lists</td>
+    <td>Switch between a)sset, p)ay, and e)xpense lists. Just "l" cycles to the next list.</td>
    </tr>
    </tr><tr>
     <td><nobr>ya[year]</nobr></td>
@@ -260,4 +522,12 @@ END;
 </html>
 END;
 }
-   
+
+///////////////////////////////////////////////////////////////////////////////
+// Add in the decimal point.
+function myapeDisplayAddAmountDecimal($amount)
+{
+   $amountLen = strlen($amount);
+   $centPos   = $amountLen - 2;
+   return substr($amount, 0, $centPos) . "." . substr($amount, $centPos);
+}
